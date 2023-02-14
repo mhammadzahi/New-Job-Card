@@ -19,15 +19,19 @@ using System.Windows.Forms;
 //using static System.Windows.Forms.VisualStyles.VisualStyleElement.ToolBar;
 using System.Diagnostics;
 using System.Drawing;
+using System.Globalization;
 
 namespace Ruby_Mattress_Management_System{
     public partial class jobCardForm : Form {
-        string fileName = null;
+        string fileName;
+        string fileNameJob;
+        int jobCrdId;
+        bool newJobCard;
         MySql.Data.MySqlClient.MySqlConnection con = new MySql.Data.MySqlClient.MySqlConnection("server=localhost; database=productionmaster; uid=root");
         public jobCardForm(){
             InitializeComponent();
         }
-        public string uploadDraw(){//return file path
+        public string uploadDraw(){//return file path --for item--
             using (OpenFileDialog openFileDialog = new OpenFileDialog()){
                 openFileDialog.InitialDirectory = "c:\\";
                 openFileDialog.Filter = "pdf files (*.pdf)|*.pdf";
@@ -42,7 +46,26 @@ namespace Ruby_Mattress_Management_System{
                 }
             }
             
-        }//end uploadDraw function
+        }//end uploadDraw for item
+        //****************************************************************
+        public string uploadDrawoJob(){//return file path --for job card--
+            using (OpenFileDialog openFileDialog = new OpenFileDialog()){
+                openFileDialog.InitialDirectory = "c:\\";
+                openFileDialog.Filter = "pdf files (*.pdf)|*.pdf";
+                openFileDialog.FilterIndex = 2;
+                openFileDialog.RestoreDirectory = true;
+
+                if (openFileDialog.ShowDialog() == DialogResult.OK)
+                {
+                    return openFileDialog.FileName;
+                }
+                else
+                {
+                    return "File not selected!";
+                }
+            }
+
+        }//end uploadDraw for Job Card
         private void verJobContr(){ //against empty jobcard  controls
             if(comboBox1.Text == string.Empty || comboBox2.Text == string.Empty || (villaRadio.Checked == false && bdgRadio.Checked == false) || comboBox3.Text == string.Empty || emiratesComb.Text == string.Empty)
                 button6.Enabled = false;
@@ -182,7 +205,8 @@ namespace Ruby_Mattress_Management_System{
             verJobContr();
         }//end refresh func
         private void Form1_Load(object sender, EventArgs e){
-            //Fill Emirates Combo
+            jobCrdId = generInt();
+            newJobCard = true;
             refresh_();
         }
 
@@ -243,6 +267,7 @@ namespace Ruby_Mattress_Management_System{
         }
 
         private void button6_Click(object sender, EventArgs e){ //add new job card to db
+
             string itemType;
             if(villaRadio.Checked == true){ //
                 itemType = "villa";
@@ -261,69 +286,43 @@ namespace Ruby_Mattress_Management_System{
             }
             //insert to database
             MySqlCommand cmd;
-            if(fileName != null && fileName != "File not selected!"){
-                if(textBox1.Text != string.Empty){
-                    byte[] pdfData = File.ReadAllBytes(fileName);
-                    cmd = new MySqlCommand("insert into job_card(order_date, delive_date, location, area, type, saleman, customer, item, drawing, lift_size_len, lift_size_width) values(@od, @dd, @loc, @a, @t, @sm, @cust, @i, @file_, @len, @wid)", con);
-                    cmd.Parameters.AddWithValue("@od", dateTimePicker2.Value);
-                    cmd.Parameters.AddWithValue("@dd", dateTimePicker1.Value);
-                    cmd.Parameters.AddWithValue("@loc", emiratesComb.Text);
-                    cmd.Parameters.AddWithValue("@a", textBox9.Text);
-                    cmd.Parameters.AddWithValue("@t", itemType);
-                    cmd.Parameters.AddWithValue("@sm", comboBox2.Text);
-                    cmd.Parameters.AddWithValue("@cust", comboBox1.Text);
-                    cmd.Parameters.AddWithValue("@i", comboBox3.Text);
-                    cmd.Parameters.AddWithValue("@file_", pdfData);
-                    cmd.Parameters.AddWithValue("@len", int.Parse(textBox8.Text));
-                    cmd.Parameters.AddWithValue("@wid", int.Parse(textBox1.Text));
-                    cmd.ExecuteNonQuery();
-                }
-                else{
-                    byte[] pdfData = File.ReadAllBytes(fileName);
-                    cmd = new MySqlCommand("insert into job_card(order_date, delive_date, location, area, type, saleman, customer, item, drawing) values(@od, @dd, @loc, @a, @t, @sm, @cust, @i, @file_)", con);
-                    cmd.Parameters.AddWithValue("@od", dateTimePicker2.Value);
-                    cmd.Parameters.AddWithValue("@dd", dateTimePicker1.Value);
-                    cmd.Parameters.AddWithValue("@loc", emiratesComb.Text);
-                    cmd.Parameters.AddWithValue("@a", textBox9.Text);
-                    cmd.Parameters.AddWithValue("@t", itemType);
-                    cmd.Parameters.AddWithValue("@sm", comboBox2.Text);
-                    cmd.Parameters.AddWithValue("@cust", comboBox1.Text);
-                    cmd.Parameters.AddWithValue("@i", comboBox3.Text);
-                    cmd.Parameters.AddWithValue("@file_", pdfData);
-                    cmd.ExecuteNonQuery();
-                }
+            if(textBox1.Text != string.Empty || textBox8.Text != string.Empty){
+                byte[] pdfData = File.ReadAllBytes(fileNameJob);
+                cmd = new MySqlCommand("insert into job_card(id_job, order_date, delive_date, location, area, type, saleman, customer, item, drawing, lift_size_len, lift_size_width) values(@id, @od, @dd, @loc, @a, @t, @sm, @cust, @i, @file_, @len, @wid)", con);
+                cmd.Parameters.AddWithValue("@id", jobCrdId);
+                cmd.Parameters.AddWithValue("@od", dateTimePicker2.Value);
+                cmd.Parameters.AddWithValue("@dd", dateTimePicker1.Value);
+                cmd.Parameters.AddWithValue("@loc", emiratesComb.Text);
+                cmd.Parameters.AddWithValue("@a", textBox9.Text);
+                cmd.Parameters.AddWithValue("@t", itemType);
+                cmd.Parameters.AddWithValue("@sm", comboBox2.Text);
+                cmd.Parameters.AddWithValue("@cust", comboBox1.Text);
+                cmd.Parameters.AddWithValue("@i", comboBox3.Text);
+                cmd.Parameters.AddWithValue("@file_", pdfData);
+                cmd.Parameters.AddWithValue("@len", int.Parse(textBox8.Text));
+                cmd.Parameters.AddWithValue("@wid", int.Parse(textBox1.Text));
+                cmd.ExecuteNonQuery();
             }
             else{
-                if(textBox1.Text != string.Empty){
-                    cmd = new MySqlCommand("insert into job_card(order_date, delive_date, location, area, type, saleman, customer, item, lift_size_len, lift_size_width) values(@od, @dd, @loc, @a, @t, @sm, @cust, @i, @len, @wid)", con);
-                    cmd.Parameters.AddWithValue("@od", dateTimePicker2.Value);
-                    cmd.Parameters.AddWithValue("@dd", dateTimePicker1.Value);
-                    cmd.Parameters.AddWithValue("@loc", emiratesComb.Text);
-                    cmd.Parameters.AddWithValue("@a", textBox9.Text);
-                    cmd.Parameters.AddWithValue("@t", itemType);
-                    cmd.Parameters.AddWithValue("@sm", comboBox2.Text);
-                    cmd.Parameters.AddWithValue("@cust", comboBox1.Text);
-                    cmd.Parameters.AddWithValue("@i", comboBox3.Text);
-                    cmd.Parameters.AddWithValue("@len", int.Parse(textBox8.Text));
-                    cmd.Parameters.AddWithValue("@wid", int.Parse(textBox1.Text));
-                    cmd.ExecuteNonQuery();
-                }
-                else{
-                    cmd = new MySqlCommand("insert into job_card(order_date, delive_date, location, area, type, saleman, customer, item) values(@od, @dd, @loc, @a, @t, @sm, @cust, @i)", con);
-                    cmd.Parameters.AddWithValue("@od", dateTimePicker2.Value);
-                    cmd.Parameters.AddWithValue("@dd", dateTimePicker1.Value);
-                    cmd.Parameters.AddWithValue("@loc", emiratesComb.Text);
-                    cmd.Parameters.AddWithValue("@a", textBox9.Text);
-                    cmd.Parameters.AddWithValue("@t", itemType);
-                    cmd.Parameters.AddWithValue("@sm", comboBox2.Text);
-                    cmd.Parameters.AddWithValue("@cust", comboBox1.Text);
-                    cmd.Parameters.AddWithValue("@i", comboBox3.Text);
-                    cmd.ExecuteNonQuery();
-                }
+                byte[] pdfData = File.ReadAllBytes(fileNameJob);
+                cmd = new MySqlCommand("insert into job_card(id_job, order_date, delive_date, location, area, type, saleman, customer, item, drawing) values(@id, @od, @dd, @loc, @a, @t, @sm, @cust, @i, @file_)", con);
+                cmd.Parameters.AddWithValue("@id", jobCrdId);
+                cmd.Parameters.AddWithValue("@od", dateTimePicker2.Value);
+                cmd.Parameters.AddWithValue("@dd", dateTimePicker1.Value);
+                cmd.Parameters.AddWithValue("@loc", emiratesComb.Text);
+                cmd.Parameters.AddWithValue("@a", textBox9.Text);
+                cmd.Parameters.AddWithValue("@t", itemType);
+                cmd.Parameters.AddWithValue("@sm", comboBox2.Text);
+                cmd.Parameters.AddWithValue("@cust", comboBox1.Text);
+                cmd.Parameters.AddWithValue("@i", comboBox3.Text);
+                cmd.Parameters.AddWithValue("@file_", pdfData);
+                cmd.ExecuteNonQuery();
             }
             con.Close();
             refresh_();
-        }
+            jobCrdId = generInt();
+            newJobCard = true;
+        }//end new job card to db
 
         private void button1_Click(object sender, EventArgs e){
             comboBox1.SelectedIndex = -1;
@@ -381,7 +380,7 @@ namespace Ruby_Mattress_Management_System{
             refresh_();
         }
 
-        private void button4_Click(object sender, EventArgs e){
+        private void button4_Click(object sender, EventArgs e){//new item in the db
             try{
                 con.Open();
             }
@@ -389,9 +388,16 @@ namespace Ruby_Mattress_Management_System{
                 MessageBox.Show(ex.Message);
             }
 
+            if(newJobCard){//create first table (job_card)
+                MySqlCommand cmd0 = new MySqlCommand("insert into job_card(id_job) values(@iddd)", con);
+                cmd0.Parameters.AddWithValue("@iddd", jobCrdId);
+                cmd0.ExecuteNonQuery();
+                newJobCard = false;
+            }
+
             //insert to database
             byte[] pdfData = File.ReadAllBytes(fileName);
-            MySqlCommand cmd = new MySqlCommand("insert into item(name_item, category_item, description_item, s_length, s_width, s_height, quantity_item, remark_item, drawing_name, drawing) values(@na, @ca, @de, @len, @wid, @hei, @qu, @re, @drn, @dr)", con);
+            MySqlCommand cmd = new MySqlCommand("insert into item(name_item, category_item, description_item, s_length, s_width, s_height, quantity_item, remark_item, drawing_name, drawing, id_job_card) values(@na, @ca, @de, @len, @wid, @hei, @qu, @re, @drn, @dr, @idJob)", con);
             cmd.Parameters.AddWithValue("@na", comboBox3.Text);
             cmd.Parameters.AddWithValue("@ca", comboBox4.Text);
             cmd.Parameters.AddWithValue("@de", textBox4.Text);
@@ -401,11 +407,13 @@ namespace Ruby_Mattress_Management_System{
             cmd.Parameters.AddWithValue("@qu", int.Parse(textBox6.Text));//int
             cmd.Parameters.AddWithValue("@re", textBox7.Text);
             cmd.Parameters.AddWithValue("@drn", button9.Text);
-            cmd.Parameters.AddWithValue("@dr", fileName);
+            cmd.Parameters.AddWithValue("@dr", pdfData);
+            cmd.Parameters.AddWithValue("@idJob", jobCrdId);
             cmd.ExecuteNonQuery();
+
             con.Close();
             refresh_();
-        }
+        }//end new item in db
 
         private void textBox7_TextChanged(object sender, EventArgs e){
             verIemContr();
@@ -633,8 +641,7 @@ namespace Ruby_Mattress_Management_System{
             }
         }
 
-        private void textBox5_TextChanged(object sender, EventArgs e)
-        {
+        private void textBox5_TextChanged(object sender, EventArgs e){//search
             int index = comboBox1.FindString(textBox5.Text);
 
             if (index != -1)
@@ -651,10 +658,23 @@ namespace Ruby_Mattress_Management_System{
             }
         }
 
-        private void button12_Click(object sender, EventArgs e){
+        private void button12_Click(object sender, EventArgs e){//switch to all job cards form
             this.Hide();
             Form2 form2 = new Form2();
             form2.Show();
         }
-    }
-}
+        public int generInt(){// convert date to int
+            DateTime date = DateTime.Now;
+            int numericalValue = (int)((date.ToUniversalTime().Ticks - new DateTime(0001, 01, 01, 0, 0, 0, DateTimeKind.Utc).Ticks) / 900000);
+            return Math.Abs(numericalValue);
+        }
+
+        private void button13_Click(object sender, EventArgs e){
+            fileNameJob = uploadDrawoJob();
+            if (fileNameJob != "File not selected!")
+                button13.Text = Path.GetFileName(fileNameJob);
+            else
+                button13.Text = "Upload Drawings";
+        }
+    }//end form
+}//end namespace

@@ -80,6 +80,7 @@
             this.textBox3 = new System.Windows.Forms.TextBox();
             this.textBox5 = new System.Windows.Forms.TextBox();
             this.button12 = new System.Windows.Forms.Button();
+            this.button13 = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridItem)).BeginInit();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
@@ -392,7 +393,7 @@
             // 
             // button10
             // 
-            this.button10.Location = new System.Drawing.Point(1158, 593);
+            this.button10.Location = new System.Drawing.Point(924, 593);
             this.button10.Name = "button10";
             this.button10.Size = new System.Drawing.Size(66, 28);
             this.button10.TabIndex = 49;
@@ -470,7 +471,7 @@
             // 
             // button11
             // 
-            this.button11.Location = new System.Drawing.Point(1091, 593);
+            this.button11.Location = new System.Drawing.Point(990, 593);
             this.button11.Name = "button11";
             this.button11.Size = new System.Drawing.Size(66, 28);
             this.button11.TabIndex = 57;
@@ -563,7 +564,7 @@
             // 
             // button12
             // 
-            this.button12.Location = new System.Drawing.Point(1020, 593);
+            this.button12.Location = new System.Drawing.Point(1056, 593);
             this.button12.Name = "button12";
             this.button12.Size = new System.Drawing.Size(71, 28);
             this.button12.TabIndex = 65;
@@ -571,11 +572,22 @@
             this.button12.UseVisualStyleBackColor = true;
             this.button12.Click += new System.EventHandler(this.button12_Click);
             // 
+            // button13
+            // 
+            this.button13.Location = new System.Drawing.Point(1127, 593);
+            this.button13.Name = "button13";
+            this.button13.Size = new System.Drawing.Size(98, 28);
+            this.button13.TabIndex = 66;
+            this.button13.Text = "Upload Drawings";
+            this.button13.UseVisualStyleBackColor = true;
+            this.button13.Click += new System.EventHandler(this.button13_Click);
+            // 
             // jobCardForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1305, 625);
+            this.Controls.Add(this.button13);
             this.Controls.Add(this.button12);
             this.Controls.Add(this.textBox5);
             this.Controls.Add(this.textBox3);
@@ -684,6 +696,7 @@
         private System.Windows.Forms.TextBox textBox3;
         private System.Windows.Forms.TextBox textBox5;
         private System.Windows.Forms.Button button12;
+        private System.Windows.Forms.Button button13;
     }
 }
 

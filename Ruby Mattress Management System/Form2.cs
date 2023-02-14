@@ -25,18 +25,17 @@ namespace Ruby_Mattress_Management_System
             frm.Show();
         }
         private void FilljobCardDJV(){
-            try
-            { //open Connection
+            try{ //open Connection
                 con.Open();
             }
-            catch (MySql.Data.MySqlClient.MySqlException ex)
-            {
+            catch (MySql.Data.MySqlClient.MySqlException ex){
                 MessageBox.Show(ex.Message);
             }
+            
+            MySqlCommand cmd = new MySqlCommand("select order_date, delive_date, location, area, type, saleman, GROUP_CONCAT(name_item SEPARATOR ', '), customer, lift_size_len, lift_size_width FROM job_card LEFT JOIN item i on job_card.id_job = i.id_item", con);
+            //MySqlCommand cmd = new MySqlCommand("select order_date, delive_date, location, area, type, saleman, name_item, customer, lift_size_len, lift_size_width FROM job_card JOIN item i on job_card.id_job = i.id_job_card", con);
 
-            MySqlCommand cmd = new MySqlCommand("select order_date, delive_date, location, area, type, saleman, customer, item, lift_size_len, lift_size_width from job_card", con);
             MySqlDataReader dr = cmd.ExecuteReader();
-
             DataTable dt = new DataTable();
             dt.Load(dr);
             jobCardDJV.DataSource = dt;
@@ -49,22 +48,15 @@ namespace Ruby_Mattress_Management_System
             jobCardDJV.Columns[3].HeaderText = "Area";
             jobCardDJV.Columns[4].HeaderText = "Type";
             jobCardDJV.Columns[5].HeaderText = "Saleman";
-            jobCardDJV.Columns[6].HeaderText = "Customer";
-            jobCardDJV.Columns[7].HeaderText = "Item";
+            jobCardDJV.Columns[6].HeaderText = "Items";
+            jobCardDJV.Columns[7].HeaderText = "Customer";
             jobCardDJV.Columns[8].HeaderText = "Lift Size Length";
             jobCardDJV.Columns[9].HeaderText = "Lift Size Width";
-
-            jobCardDJV.Columns[0].HeaderCell.Style.Alignment = DataGridViewContentAlignment.MiddleCenter;
-            jobCardDJV.Columns[1].HeaderCell.Style.Alignment = DataGridViewContentAlignment.MiddleCenter;
-            jobCardDJV.Columns[2].HeaderCell.Style.Alignment = DataGridViewContentAlignment.MiddleCenter;
-            jobCardDJV.Columns[3].HeaderCell.Style.Alignment = DataGridViewContentAlignment.MiddleCenter;
-            jobCardDJV.Columns[4].HeaderCell.Style.Alignment = DataGridViewContentAlignment.MiddleCenter;
-            jobCardDJV.Columns[5].HeaderCell.Style.Alignment = DataGridViewContentAlignment.MiddleCenter;
-            jobCardDJV.Columns[6].HeaderCell.Style.Alignment = DataGridViewContentAlignment.MiddleCenter;
-            jobCardDJV.Columns[7].HeaderCell.Style.Alignment = DataGridViewContentAlignment.MiddleCenter;
-            jobCardDJV.Columns[8].HeaderCell.Style.Alignment = DataGridViewContentAlignment.MiddleCenter;
-            jobCardDJV.Columns[9].HeaderCell.Style.Alignment = DataGridViewContentAlignment.MiddleCenter;
-
+            for(int i = 0; i < 10; i++){
+                jobCardDJV.Columns[i].HeaderCell.Style.Alignment = DataGridViewContentAlignment.MiddleCenter;
+            }
+            
+            jobCardDJV.Columns[6].Width = 150;
 
             jobCardDJV.ColumnHeadersDefaultCellStyle.BackColor = Color.Coral;
             jobCardDJV.EnableHeadersVisualStyles = false;
